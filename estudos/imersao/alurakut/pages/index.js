@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import {AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet} from '../src/lib/AluraKutCommons'
@@ -21,13 +21,35 @@ function ProfileSideBar ({gitHubUser}) {
   </Box>
   )
 }
+function ProfileRelationsBox ({itens, title})  {
+  return (
+    <ProfileRelationsBoxWrapper>
+          <h2 className="smallTitle">
+            {title} ({itens.length})
+          </h2>
+          <ul>
+          {/* {comunidades.map((itemAtual) => {
+            return (
+              <li key={itemAtual.id}>
+                <a href={`/users/${itemAtual.title}`} >
+                  <img src={itemAtual.image}/>
+                  <span>{itemAtual.title}</span>
+                </a>
+              </li>
+              
+            )
+          })} */}
+          </ul>
+        </ProfileRelationsBoxWrapper>
+  )
+}
 
 
 export default function Home() {
-  const [allComunidades, setAllComunidades] = useState([]);
+  // const [allComunidades, setAllComunidades] = useState([]);
   const [numComunidades, setNumComunidades] = useState(0);
   const [comunidades, setComunidades ] = useState([]);
-
+  // console.log(allComunidades);
   const gitHubUser = "joaovitorufu";
   const pessoasFavoritas = [
   'juunegreiros',
@@ -37,7 +59,19 @@ export default function Home() {
   'bsz-bruno',
   'vercel'
   ]
-  console.log(allComunidades);
+  //senha do Dato : Test123456
+    const [seguidores, setSeguidores] = useState([]);
+    useEffect(function(){
+      fetch('https://api.github.com/users/peas/followers')
+    .then((respostaDoServidor)=>{
+      return respostaDoServidor.json();
+    })
+    .then((respostaCompleta)=>{
+      setSeguidores(respostaCompleta);
+    })
+    }, [])
+
+
   return (
     <>
     <AlurakutMenu/>
@@ -65,14 +99,13 @@ export default function Home() {
                   image : dadosDoForm.get('image')
                 }
                 const comunidadesHome = [...comunidades,comunidade]
-                const allComunidades = [...comunidades,comunidade]
-                if(comunidades.length<6){
-                    setComunidades(comunidadesHome)
-                    setAllComunidades(allComunidades)
+                // const allComunidades = [...comunidades,comunidade]
+                
+                setComunidades(comunidadesHome) // erro
+                // if(comunidades.length<6){
                     
-                }else{
-                  setAllComunidades(allComunidades)
-                }
+                // }
+                // setAllComunidades(allComunidades)
                 setNumComunidades(numComunidades + 1)
 
             }}>
@@ -102,15 +135,20 @@ export default function Home() {
       </div>
 
       <div className="profileRelationsArea" style={{gridArea:'profileRelationsArea'}}>
+        <ProfileRelationsBox 
+        title="seguidores"
+        itens = {seguidores} 
+        />
+
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">
             Pessoas Da Comunidade ({pessoasFavoritas.length})
           </h2>
           <ul>
-          {pessoasFavoritas.map((itemAtual) => {
+          {pessoasFavoritas.map( (itemAtual) => {
             return (
               <li key={itemAtual}>
-                <a href={`https://github.com/${itemAtual}`}>
+                <a href={`/users/${itemAtual}`}>
                   <img src={`https://github.com/${itemAtual}.png`}/>
                   <span>{itemAtual}</span>
                 </a>
@@ -127,8 +165,8 @@ export default function Home() {
           <ul>
           {comunidades.map((itemAtual) => {
             return (
-              <li>
-                <a href={`/users/${itemAtual.title}`} key={itemAtual.id}>
+              <li key={itemAtual.id}>
+                <a href={`/users/${itemAtual.title}`} >
                   <img src={itemAtual.image}/>
                   <span>{itemAtual.title}</span>
                 </a>
