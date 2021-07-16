@@ -1,0 +1,1 @@
+Componentizar o index para tornar o projeto mais organizado possivel.

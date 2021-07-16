@@ -46,10 +46,8 @@ function ProfileRelationsBox ({itens, title})  {
 
 
 export default function Home() {
-  // const [allComunidades, setAllComunidades] = useState([]);
-  const [numComunidades, setNumComunidades] = useState(0);
+
   const [comunidades, setComunidades ] = useState([]);
-  // console.log(allComunidades);
   const gitHubUser = "joaovitorufu";
   const pessoasFavoritas = [
   'juunegreiros',
@@ -61,6 +59,7 @@ export default function Home() {
   ]
   //senha do Dato : Test123456
     const [seguidores, setSeguidores] = useState([]);
+
     useEffect(function(){
       fetch('https://api.github.com/users/peas/followers')
     .then((respostaDoServidor)=>{
@@ -69,6 +68,31 @@ export default function Home() {
     .then((respostaCompleta)=>{
       setSeguidores(respostaCompleta);
     })
+
+    //api GraphQL
+      fetch('https://graphql.datocms.com/', {
+        method: 'POST',
+        headers: {
+          'Authorization': '1b5b4f7d83f39b0b933969f1c4a2a7',
+           'Content-Type': 'application/json',
+           'Accept':'application/json',
+        },
+        body: JSON.stringify({"query": `query {
+          allCommunities {
+            title
+            id
+            imageUrl
+            creatorSlug
+          }
+        }`})
+      })
+      .then((response)=> response.json())
+      .then((respostaCompleta)=>{
+        const comunidadesDato = respostaCompleta.data.allCommunities;
+        console.log(comunidadesDato)
+        console.log(respostaCompleta)
+        setComunidades(comunidadesDato)
+      })
     }, [])
 
 
@@ -99,14 +123,9 @@ export default function Home() {
                   image : dadosDoForm.get('image')
                 }
                 const comunidadesHome = [...comunidades,comunidade]
-                // const allComunidades = [...comunidades,comunidade]
                 
-                setComunidades(comunidadesHome) // erro
-                // if(comunidades.length<6){
+                setComunidades(comunidadesHome)
                     
-                // }
-                // setAllComunidades(allComunidades)
-                setNumComunidades(numComunidades + 1)
 
             }}>
               <div>
@@ -142,15 +161,15 @@ export default function Home() {
 
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">
-            Pessoas Da Comunidade ({pessoasFavoritas.length})
+            Comunidades ({comunidades.length})
           </h2>
           <ul>
-          {pessoasFavoritas.map( (itemAtual) => {
+          {comunidades.map((itemAtual) => {
             return (
-              <li key={itemAtual}>
-                <a href={`/users/${itemAtual}`}>
-                  <img src={`https://github.com/${itemAtual}.png`}/>
-                  <span>{itemAtual}</span>
+              <li key={itemAtual.id}>
+                <a href={`/communities/${itemAtual.id}`} >
+                  <img src={itemAtual.imageUrl}/>
+                  <span>{itemAtual.title}</span>
                 </a>
               </li>
               
@@ -160,15 +179,15 @@ export default function Home() {
         </ProfileRelationsBoxWrapper>
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">
-            Comunidades ({numComunidades})
+            Pessoas Da Comunidade ({pessoasFavoritas.length})
           </h2>
           <ul>
-          {comunidades.map((itemAtual) => {
+          {pessoasFavoritas.map( (itemAtual) => {
             return (
-              <li key={itemAtual.id}>
-                <a href={`/users/${itemAtual.title}`} >
-                  <img src={itemAtual.image}/>
-                  <span>{itemAtual.title}</span>
+              <li key={itemAtual}>
+                <a href={`/users/${itemAtual}`}>
+                  <img src={`https://github.com/${itemAtual}.png`}/>
+                  <span>{itemAtual}</span>
                 </a>
               </li>
               
